@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class Torneio {
     private Jogador[] jogadores;
     private int numeroDeJogadores;
@@ -6,8 +8,7 @@ public class Torneio {
     public Torneio() {
         jogadores = new Jogador[10];
         numeroDeJogadores = 0;
-        // Inicializa JogoDados com o número de dados e tipo de jogo
-        jogoDados = new JogoDados(2, "Azar"); // Exemplo de configuração
+        jogoDados = new JogoDados();
     }
 
     public void incluirJogador(Jogador jogador) {
@@ -42,47 +43,72 @@ public class Torneio {
 
             for (int i = 0; i < numeroDeJogadores; i++) {
                 Jogador jogador = jogadores[i];
-                int aposta = jogador.getSaldo() / 10; // Exemplo de aposta: 10% do saldo
+                double aposta = jogador.getSaldo() / 10; // Exemplo de aposta: 10% do saldo
                 jogador.setAposta(aposta);
 
-                System.out.println(jogador.getId() + " apostou " + aposta + " moedas.");
+                System.out.printf("%s apostou %.2f moedas.%n", jogador.getId(), aposta);
 
-                // Escolhe aleatoriamente um dos três jogos
-                int tipoDeJogo = (int) (Math.random() * 3);
-                boolean ganhou = false;
+                // Escolhe aleatoriamente dois jogos diferentes para cada jogador
+                int[] tiposDeJogo = {0, 1, 2};
+                shuffle(tiposDeJogo);
+                boolean ganhou;
 
-                switch (tipoDeJogo) {
-                    case 0:
-                        System.out.println(jogador.getId() + " está jogando Jogo de Azar.");
-                        ganhou = jogoDados.jogoAzar(jogador);
-                        break;
-                    case 1:
-                        System.out.println(jogador.getId() + " está jogando Bozó.");
-                        ganhou = jogoDados.jogoBozo(jogador);
-                        break;
-                    case 2:
-                        System.out.println(jogador.getId() + " está jogando Jogo do Porquinho.");
-                        ganhou = jogoDados.jogoPorquinho(jogador);
-                        break;
-                }
+                for (int tipoDeJogo : tiposDeJogo) {
+                    switch (tipoDeJogo) {
+                        case 0:
+                            System.out.printf("%s está jogando Jogo de Azar.%n", jogador.getId());
+                            ganhou = jogoDados.jogoAzar(jogador);
+                            break;
+                        case 1:
+                            System.out.printf("%s está jogando Bozó.%n", jogador.getId());
+                            double pontuacaoBozo = jogoDados.jogoBozo(jogador);
+                            ganhou = pontuacaoBozo > 0;
+                            break;
+                        case 2:
+                            System.out.printf("%s está jogando Jogo do Porquinho.%n", jogador.getId());
+                            double pontosPorquinho = jogoDados.jogoPorquinho(jogador);
+                            ganhou = pontosPorquinho >= 300;
+                            break;
+                        default:
+                            continue;
+                    }
 
-                if (ganhou) {
-                    jogador.ajustarSaldo(aposta);
-                    System.out.println(jogador.getId() + " ganhou a rodada! + " + aposta + " moedas.");
-                } else {
-                    jogador.ajustarSaldo(-aposta);
-                    System.out.println(jogador.getId() + " perdeu a rodada. - " + aposta + " moedas.");
+                    if (ganhou) {
+                        jogador.ajustarSaldo(aposta);
+                        System.out.printf("%s ganhou a rodada! +%.2f moedas.%n", jogador.getId(), aposta);
+                    } else {
+                        jogador.ajustarSaldo(-aposta);
+                        System.out.printf("%s perdeu a rodada. -%.2f moedas.%n", jogador.getId(), aposta);
+                    }
+
+                    // Atualiza o saldo do adversário
+                    for (int j = 0; j < numeroDeJogadores; j++) {
+                        if (j != i) {
+                            jogadores[j].ajustarSaldo(-aposta);
+                        }
+                    }
                 }
             }
         }
+
         System.out.println("Torneio concluído!");
-        placarTorneio();
     }
 
     public void placarTorneio() {
         System.out.println("Placar do torneio:");
         for (int i = 0; i < numeroDeJogadores; i++) {
-            System.out.println(jogadores[i].getId() + " - Saldo: " + jogadores[i].getSaldo());
+            Jogador jogador = jogadores[i];
+            System.out.printf("%s - Saldo: %.2f%n", jogador.getId(), jogador.getSaldo());
+        }
+    }
+
+    private void shuffle(int[] array) {
+        Random random = new Random();
+        for (int i = array.length - 1; i > 0; i--) {
+            int index = random.nextInt(i + 1);
+            int temp = array[index];
+            array[index] = array[i];
+            array[i] = temp;
         }
     }
 }

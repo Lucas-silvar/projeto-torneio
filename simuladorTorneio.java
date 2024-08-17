@@ -1,3 +1,4 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class simuladorTorneio {
@@ -7,7 +8,7 @@ public class simuladorTorneio {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("\nMenu:");
+            System.out.println("Menu:");
             System.out.println("(1) Incluir jogador");
             System.out.println("(2) Remover jogador");
             System.out.println("(3) Iniciar torneio");
@@ -15,14 +16,21 @@ public class simuladorTorneio {
             System.out.println("(7) Sair");
             System.out.print("Escolha uma opção: ");
 
-            int opcao = scanner.nextInt();
-            scanner.nextLine(); // Consome a nova linha
+            int opcao = -1;
+            try {
+                opcao = scanner.nextInt();
+                scanner.nextLine(); // Consome a nova linha
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida. Por favor, insira um número.");
+                scanner.nextLine(); // Limpa o buffer do scanner
+                continue;
+            }
 
             switch (opcao) {
                 case 1:
                     System.out.print("Digite o ID do jogador: ");
                     String id = scanner.nextLine();
-                    System.out.print("Jogador humano ou máquina? ");
+                    System.out.print("Jogador é humano? (sim/não): ");
                     String tipo = scanner.nextLine();
                     Jogador jogador = new Jogador(id, tipo);
                     torneio.incluirJogador(jogador);
@@ -43,7 +51,7 @@ public class simuladorTorneio {
                     scanner.close();
                     return;
                 default:
-                    System.out.println("Opção inválida. Tente novamente.");
+                    System.out.println("Opção inválida.");
             }
         }
     }
