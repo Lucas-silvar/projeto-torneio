@@ -1,17 +1,18 @@
+import java.util.Random;
+
 public class Dado {
     private int valor;
-    private static final int MAX = 6; // Valor máximo de um dado
+    private static final Random random = new Random();
 
     public Dado() {
-        lançar(); // Inicializa o dado com um valor aleatório
+        rolar();
     }
 
-    public void lançar() {
-        valor = (int) (Math.random() * MAX) + 1;
+    public void rolar() {
+        valor = random.nextInt(6) + 1; // Gera um valor entre 1 e 6
     }
 
     public int getValor() {
         return valor;
     }
 }
-//testes

@@ -1,36 +1,34 @@
 import java.util.Scanner;
 
 public class simuladorTorneio {
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         Torneio torneio = new Torneio();
+        Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("Escolha uma opção:");
-            System.out.println("1. Incluir jogador");
-            System.out.println("2. Remover jogador");
-            System.out.println("3. Iniciar torneio");
-            System.out.println("4. Placar do torneio");
-            System.out.println("5. Gravar dados");
-            System.out.println("6. Ler dados");
-            System.out.println("7. Sair");
+            System.out.println("\nMenu:");
+            System.out.println("(1) Incluir jogador");
+            System.out.println("(2) Remover jogador");
+            System.out.println("(3) Iniciar torneio");
+            System.out.println("(4) Placar do torneio");
+            System.out.println("(7) Sair");
+            System.out.print("Escolha uma opção: ");
+
             int opcao = scanner.nextInt();
-            scanner.nextLine(); // Consumir a nova linha
+            scanner.nextLine(); // Consome a nova linha
 
             switch (opcao) {
                 case 1:
                     System.out.print("Digite o ID do jogador: ");
                     String id = scanner.nextLine();
-                    System.out.print("Digite o tipo do jogador (humano ou maquina): ");
+                    System.out.print("Jogador humano ou máquina? ");
                     String tipo = scanner.nextLine();
                     Jogador jogador = new Jogador(id, tipo);
-                    System.out.print("Escolha o tipo de jogo (Azar, Bozo, Porquinho): ");
-                    String tipoJogo = scanner.nextLine();
-                    jogador.setJogo(tipoJogo);
-                    torneio.adicionarJogador(jogador);
+                    torneio.incluirJogador(jogador);
                     break;
                 case 2:
-                    System.out.print("Digite o ID do jogador para remover: ");
+                    System.out.print("Digite o ID do jogador a ser removido: ");
                     String idRemover = scanner.nextLine();
                     torneio.removerJogador(idRemover);
                     break;
@@ -38,19 +36,14 @@ public class simuladorTorneio {
                     torneio.iniciarTorneio();
                     break;
                 case 4:
-                    // Exibir placar
-                    break;
-                case 5:
-                    // Gravar dados em arquivo
-                    break;
-                case 6:
-                    // Ler dados de arquivo
+                    torneio.placarTorneio();
                     break;
                 case 7:
+                    System.out.println("Saindo...");
                     scanner.close();
                     return;
                 default:
-                    System.out.println("Opção inválida.");
+                    System.out.println("Opção inválida. Tente novamente.");
             }
         }
     }

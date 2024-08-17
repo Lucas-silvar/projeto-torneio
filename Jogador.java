@@ -1,25 +1,22 @@
 public class Jogador {
     private String id;
-    private String tipo;
+    private String tipo; // humano ou máquina
     private int saldo;
     private int aposta;
-    private int resultado;
-    private JogoDados.JogoAzar jogoAzar;
-    private JogoDados.Bozo jogoBozo;
-    private JogoDados.JogoPorquinho jogoPorquinho;
+    private Dado[] dados;
 
     public Jogador(String id, String tipo) {
         this.id = id;
         this.tipo = tipo;
-        this.saldo = 100; // Saldo inicial
+        this.saldo = 100; // Valor inicial padrão
+        this.dados = new Dado[5]; // Para o Jogo de Bozó
+        for (int i = 0; i < dados.length; i++) {
+            dados[i] = new Dado();
+        }
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getTipo() {
-        return tipo;
     }
 
     public int getSaldo() {
@@ -30,39 +27,27 @@ public class Jogador {
         this.aposta = aposta;
     }
 
-    public int getAposta() {
-        return aposta;
+    public void ajustarSaldo(int valor) {
+        saldo += valor;
     }
 
-    public void atualizarSaldo(int valor) {
-        this.saldo += valor;
-    }
-
-    public void setJogo(String tipoJogo) {
-        switch (tipoJogo) {
-            case "Azar":
-                this.jogoAzar = new JogoDados.JogoAzar();
-                break;
-            case "Bozo":
-                this.jogoBozo = new JogoDados.Bozo();
-                break;
-            case "Porquinho":
-                this.jogoPorquinho = new JogoDados.JogoPorquinho();
-                break;
-            default:
-                throw new IllegalArgumentException("Tipo de jogo desconhecido");
+    public void rolarDados() {
+        for (Dado dado : dados) {
+            dado.rolar();
         }
     }
 
-    public int jogar(Dado[] dados) {
-        if (jogoAzar != null) {
-            return jogoAzar.jogar(dados);
-        } else if (jogoBozo != null) {
-            return jogoBozo.jogar(dados);
-        } else if (jogoPorquinho != null) {
-            return jogoPorquinho.jogar(dados);
-        } else {
-            throw new IllegalStateException("Jogo não definido");
-        }
+    public Dado[] getDados() {
+        return dados;
+    }
+
+    public int getPontuacao() {
+        // Aqui você pode implementar a lógica para calcular a pontuação se necessário
+        return saldo; // Exemplo básico
+    }
+
+    @Override
+    public String toString() {
+        return id + " - Saldo: " + saldo;
     }
 }
