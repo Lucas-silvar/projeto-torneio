@@ -66,7 +66,7 @@ public class JogoDados {
     }
 
     private int calcularPontuacao(int[] dados) {
-        int[] contagem = new int[7]; // Contagem das faces dos dados
+        int[] contagem = new int[7];
 
         for (int dado : dados) {
             contagem[dado]++;
@@ -74,7 +74,6 @@ public class JogoDados {
 
         int pontuacao = 0;
 
-        // Verifica as pontuações de acordo com as regras
         for (int i = 1; i <= 6; i++) {
             if (contagem[i] == 5) {
                 pontuacao = 50; // General
@@ -96,9 +95,7 @@ public class JogoDados {
             }
         }
 
-        // Verifica as pontuações especiais
         if (pontuacao == 0) {
-            // Verifica se é seguida
             boolean seguida = true;
             for (int i = 0; i < 5; i++) {
                 if (i > 0 && dados[i] != dados[i - 1] + 1) {

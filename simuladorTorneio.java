@@ -21,10 +21,10 @@ public class simuladorTorneio {
             int opcao = -1;
             try {
                 opcao = scanner.nextInt();
-                scanner.nextLine(); // Consome a nova linha
+                scanner.nextLine();
             } catch (InputMismatchException e) {
                 System.out.println("Entrada inválida. Por favor, insira um número.");
-                scanner.nextLine(); // Limpa o buffer do scanner
+                scanner.nextLine();
                 continue;
             }
 
@@ -36,10 +36,10 @@ public class simuladorTorneio {
                     int tipo = -1;
                     try {
                         tipo = scanner.nextInt();
-                        scanner.nextLine(); // Consome a nova linha
+                        scanner.nextLine();
                     } catch (InputMismatchException e) {
                         System.out.println("Entrada inválida. Por favor, insira 0 ou 1.");
-                        scanner.nextLine(); // Limpa o buffer do scanner
+                        scanner.nextLine();
                         continue;
                     }
                     Jogador jogador = new Jogador(id, tipo == 1 ? "humano" : "máquina");
@@ -51,12 +51,10 @@ public class simuladorTorneio {
                     torneio.removerJogador(idRemover);
                     break;
                 case 3:
-                    List<Integer> jogosEscolhidos = escolherJogos(scanner);
-                    if (jogosEscolhidos.size() >= 2) {
-                        torneio.escolherJogos(jogosEscolhidos);
-                        torneio.iniciarTorneio();
-                    } else {
-                        System.out.println("Você deve escolher pelo menos 2 jogos.");
+                    int jogoEscolhido = escolherJogo(scanner);
+                    if (jogoEscolhido != -1) {
+                        torneio.escolherJogo(jogoEscolhido);
+                        torneio.iniciarTorneio(scanner); // Passando o scanner para coletar apostas
                     }
                     break;
                 case 4:
@@ -72,47 +70,27 @@ public class simuladorTorneio {
         }
     }
 
-    private static List<Integer> escolherJogos(Scanner scanner) {
-        List<Integer> jogosEscolhidos = new ArrayList<>();
-
-        System.out.println("Escolha os jogos que deseja jogar:");
-        System.out.println("(1) Jogo de Azar e Jogo do Porquinho");
-        System.out.println("(2) Jogo de Azar e Bozó");
-        System.out.println("(3) Bozó e Jogo do Porquinho");
-        System.out.println("(4) Jogo do Porquinho, Jogo de Azar e Bozó");
+    private static int escolherJogo(Scanner scanner) {
+        System.out.println("Escolha o jogo para o torneio:");
+        System.out.println("(0) Jogo de Azar");
+        System.out.println("(1) Bozó");
+        System.out.println("(2) Jogo do Porquinho");
 
         int escolha = -1;
         try {
             escolha = scanner.nextInt();
-            scanner.nextLine(); // Consome a nova linha
+            scanner.nextLine();
         } catch (InputMismatchException e) {
-            System.out.println("Entrada inválida. Por favor, insira um número entre 1 e 4.");
-            scanner.nextLine(); // Limpa o buffer do scanner
-            return jogosEscolhidos;
+            System.out.println("Entrada inválida. Por favor, insira um número entre 0 e 2.");
+            scanner.nextLine();
+            return -1;
         }
 
-        switch (escolha) {
-            case 1:
-                jogosEscolhidos.add(0); // Jogo de Azar
-                jogosEscolhidos.add(2); // Jogo do Porquinho
-                break;
-            case 2:
-                jogosEscolhidos.add(0); // Jogo de Azar
-                jogosEscolhidos.add(1); // Bozó
-                break;
-            case 3:
-                jogosEscolhidos.add(1); // Bozó
-                jogosEscolhidos.add(2); // Jogo do Porquinho
-                break;
-            case 4:
-                jogosEscolhidos.add(0); // Jogo de Azar
-                jogosEscolhidos.add(1); // Bozó
-                jogosEscolhidos.add(2); // Jogo do Porquinho
-                break;
-            default:
-                System.out.println("Opção inválida. Nenhum jogo foi escolhido.");
+        if (escolha < 0 || escolha > 2) {
+            System.out.println("Opção inválida.");
+            return -1;
         }
 
-        return jogosEscolhidos;
+        return escolha;
     }
 }
