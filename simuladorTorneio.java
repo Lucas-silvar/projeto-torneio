@@ -71,8 +71,7 @@ public class simuladorTorneio {
     private static int escolherJogo(Scanner scanner) {
         System.out.println("Escolha o jogo para o torneio:");
         System.out.println("(0) Jogo de Azar");
-        System.out.println("(1) Bozó");
-        System.out.println("(2) Jogo do Porquinho");
+        System.out.println("(1) Jogo do Porquinho");
 
         int escolha = -1;
         try {

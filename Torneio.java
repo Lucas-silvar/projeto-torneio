@@ -95,9 +95,6 @@ public class Torneio {
                         ganhou = jogoDados.jogoAzar(jogador);
                         break;
                     case 1:
-                        premio = jogoDados.jogoBozo(jogador);
-                        break;
-                    case 2:
                         premio = jogoDados.jogoPorquinho(jogador);
                         break;
                 }
