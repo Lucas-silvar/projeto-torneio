@@ -1,23 +1,20 @@
-import java.util.Random;
-
 public class Dado {
-    private int valor;
+    private int sideUP;
 
     public Dado() {
-        this.lancar();
+        this.sideUP = 1;
     }
 
-    public void lancar() {
-        Random random = new Random();
-        this.valor = random.nextInt(6) + 1;
+    public void roll() {
+        this.sideUP = (int)(Math.random() * 6) + 1;
     }
 
-    public int getValor() {
-        return valor;
+    public int getSideUp() {
+        return this.sideUP;
     }
 
     @Override
     public String toString() {
-        return "Dado: " + valor;
+        return Integer.toString(this.sideUP);
     }
 }

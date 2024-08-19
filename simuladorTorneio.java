@@ -4,8 +4,8 @@ import java.util.Scanner;
 public class simuladorTorneio {
 
     public static void main(String[] args) {
-        Torneio torneio = new Torneio();
         Scanner scanner = new Scanner(System.in);
+        Torneio torneio = new Torneio(10); // Defina uma capacidade fixa para o torneio
 
         while (true) {
             System.out.println("Menu:");
@@ -92,4 +92,3 @@ public class simuladorTorneio {
         return escolha;
     }
 }
-//
