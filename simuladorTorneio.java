@@ -78,12 +78,12 @@ public class simuladorTorneio {
             escolha = scanner.nextInt();
             scanner.nextLine();
         } catch (InputMismatchException e) {
-            System.out.println("Entrada inválida. Por favor, insira um número entre 0 e 2.");
+            System.out.println("Entrada inválida. Por favor, insira um número entre 0 e 1.");
             scanner.nextLine();
             return -1;
         }
 
-        if (escolha < 0 || escolha > 2) {
+        if (escolha < 0 || escolha > 1) {
             System.out.println("Opção inválida.");
             return -1;
         }

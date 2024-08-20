@@ -1,5 +1,5 @@
 import java.util.Scanner;
-import java.util.InputMismatchException;
+
 public class Torneio {
     private Jogador[] jogadores;
     private int numJogadores;
@@ -46,82 +46,114 @@ public class Torneio {
             return;
         }
 
-        aplicarRegraJogo(scanner);
-        System.out.println("Torneio finalizado.");
-    }
-
-    private void aplicarRegraJogo(Scanner scanner) {
-        JogoDados jogoDados = new JogoDados();
-        Jogador vencedor = null;
+        // Restabelece o saldo dos jogadores
+        for (int i = 0; i < numJogadores; i++) {
+            jogadores[i].setSaldo(100); // Define o saldo inicial de 100 moedas
+        }
 
         while (numJogadores > 1) {
-            for (int i = 0; i < numJogadores; i++) {
-                Jogador jogador = jogadores[i];
-                if (jogador.getSaldo() <= 0) {
-                    continue;
-                }
-
-                System.out.printf("Jogador %s (%s) está jogando.%n", jogador.getId(), jogador.getTipo());
-                System.out.printf("Saldo atual: %.2f%n", jogador.getSaldo());
-
-                double aposta;
-                if (jogador.isMaquina()) {
-                    aposta = jogador.getSaldo() > 5 ? jogador.getSaldo() / 5 : jogador.getSaldo();
-                } else {
-                    while (true) {
-                        System.out.print("Informe o valor que deseja apostar: ");
-                        try {
-                            aposta = scanner.nextDouble();
-                            scanner.nextLine();
-                            if (aposta > 0 && aposta <= jogador.getSaldo()) {
-                                break;
-                            } else {
-                                System.out.println("Valor de aposta inválido. Deve ser positivo e não maior que o saldo.");
-                            }
-                        } catch (InputMismatchException e) {
-                            System.out.println("Entrada inválida. Por favor, insira um número.");
-                            scanner.nextLine();
-                        }
-                    }
-                }
-
-                jogador.setAposta(aposta);
-
-                boolean ganhou = false;
-                double premio = 0;
-
-                switch (jogoEscolhido) {
-                    case 0:
-                        ganhou = jogoDados.jogoAzar(jogador);
-                        break;
-                    case 1:
-                        premio = jogoDados.jogoPorquinho(jogador);
-                        break;
-                }
-
-                if (ganhou || premio > 0) {
-                    double valorGanho = premio > 0 ? premio : aposta;
-                    jogador.ajustarSaldo(valorGanho);
-                    System.out.printf("Jogador %s ganhou! Novo saldo: %.2f%n", jogador.getId(), jogador.getSaldo());
-                } else {
-                    jogador.ajustarSaldo(-aposta);
-                    System.out.printf("Jogador %s perdeu. Novo saldo: %.2f%n", jogador.getId(), jogador.getSaldo());
-
-                    if (jogador.getSaldo() <= 0) {
-                        jogador.setSaldo(0);
-                        System.out.println("Jogador " + jogador.getId() + " perdeu e seu saldo foi ajustado para zero.");
-                        removerJogador(jogador.getId());
-                        i--; // Ajusta o índice após a remoção
-                    }
-                }
+            // Executa as rodadas do torneio
+            while (numJogadores > 1) {
+                executarRodada(scanner);
             }
         }
 
         if (numJogadores == 1) {
-            vencedor = jogadores[0];
+            Jogador vencedor = jogadores[0];
             System.out.printf("O vencedor do torneio é %s com um saldo de %.2f%n", vencedor.getId(), vencedor.getSaldo());
         } else {
             System.out.println("Não há um vencedor único. O torneio terminou sem um vencedor.");
+        }
+    }
+
+    private void executarRodada(Scanner scanner) {
+        double[] apostas = new double[numJogadores];
+        boolean[] resultados = new boolean[numJogadores];
+        double[] premios = new double[numJogadores];
+        double totalApostas = 0;
+        double maiorRetorno = -1;
+        int[] vencedores = new int[numJogadores];
+        int numVencedores = 0;
+
+        // Coleta apostas e executa o jogo para cada jogador
+        for (int i = 0; i < numJogadores; i++) {
+            Jogador jogador = jogadores[i];
+
+            if (jogador.getSaldo() <= 0) {
+                continue;
+            }
+
+            double aposta;
+            if (jogador.isMaquina()) {
+                aposta = jogador.getSaldo() / 5;
+            } else {
+                while (true) {
+                    System.out.print("Jogador " + jogador.getId() + ", informe o valor que deseja apostar: ");
+                    aposta = scanner.nextDouble();
+                    scanner.nextLine();
+                    if (aposta > 0 && aposta <= jogador.getSaldo()) {
+                        break;
+                    } else {
+                        System.out.println("Valor de aposta inválido. Deve ser positivo e não maior que o saldo.");
+                    }
+                }
+            }
+
+            jogador.setAposta(aposta);
+            jogador.ajustarSaldo(-aposta);
+            apostas[i] = aposta;
+            totalApostas += aposta;
+
+            boolean ganhou = false;
+            double premio = 0;
+
+            switch (jogoEscolhido) {
+                case 0:
+                    ganhou = new JogoDados().jogoAzar(jogador);
+                    break;
+                case 1:
+                    premio = new JogoDados().jogoPorquinho(jogador);
+                    break;
+            }
+
+            if (ganhou) {
+                premios[i] = aposta;
+                if (premio > 0) {
+                    premios[i] += premio;
+                }
+
+                if (premios[i] > maiorRetorno) {
+                    maiorRetorno = premios[i];
+                    numVencedores = 0;
+                }
+
+                if (premios[i] == maiorRetorno) {
+                    vencedores[numVencedores++] = i;
+                }
+            }
+        }
+
+        // Distribui as apostas dos oponentes para os vencedores
+        if (numVencedores > 0) {
+            double valorParaCada = totalApostas / numVencedores;
+            for (int i = 0; i < numVencedores; i++) {
+                int vencedorIndex = vencedores[i];
+                jogadores[vencedorIndex].ajustarSaldo(valorParaCada);
+            }
+        }
+
+        // Atualiza o saldo dos jogadores e remove os que têm saldo zero
+        System.out.println("Relatório da Rodada:");
+        for (int i = 0; i < numJogadores; i++) {
+            Jogador jogador = jogadores[i];
+            if (jogador.getSaldo() <= 0) {
+                jogador.setSaldo(0);
+                System.out.println("Jogador " + jogador.getId() + " foi eliminado por saldo insuficiente.");
+                removerJogador(jogador.getId());
+                i--; // Ajusta o índice após a remoção
+            } else {
+                System.out.printf("Jogador %s - Aposta: %.2f - Saldo Atual: %.2f%n", jogador.getId(), apostas[i], jogador.getSaldo());
+            }
         }
     }
 

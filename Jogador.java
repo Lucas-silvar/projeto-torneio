@@ -7,7 +7,7 @@ public class Jogador {
     public Jogador(String id, String tipo) {
         this.id = id;
         this.tipo = tipo;
-        this.saldo = 100; // Saldo inicial padrão
+        this.saldo = 0; // O saldo será definido ao iniciar o torneio
     }
 
     // Getters e Setters
