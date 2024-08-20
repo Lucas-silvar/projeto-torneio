@@ -1,4 +1,7 @@
-public class Jogador {
+import java.io.Serializable;
+
+public class Jogador implements Serializable {
+    private static final long serialVersionUID = 1L; // Para garantir a compatibilidade na serialização
     private String id;
     private boolean humano;
     private double saldo;
@@ -51,6 +54,6 @@ public class Jogador {
 
     @Override
     public String toString() {
-        return String.format("Jogador %s - Saldo: %.2f", id, saldo);
+        return String.format("Jogador %s - Saldo: %.2f - Número de Jogadas: %d", id, saldo, numeroDeJogadas);
     }
 }

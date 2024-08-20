@@ -1,4 +1,7 @@
-public class Dado {
+import java.io.Serializable;
+
+public class Dado implements Serializable {
+    private static final long serialVersionUID = 1L; // Para garantir a compatibilidade na serialização
     private int sideUP;
 
     public Dado() {

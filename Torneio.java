@@ -1,72 +1,55 @@
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Torneio {
-    private Jogador[] jogadores;
-    private int quantidadeJogadores;
+    private List<Jogador> jogadores;
     private int jogoEscolhido;
+   public static final int MAX_JOGADORES = 10; // Atributo final como número máximo de jogadores
 
     public Torneio(int capacidade) {
-        jogadores = new Jogador[capacidade];
-        quantidadeJogadores = 0;
+        jogadores = new ArrayList<>(capacidade);
         jogoEscolhido = -1;
     }
 
     public void incluirJogador(Jogador jogador) {
-        if (quantidadeJogadores < jogadores.length) {
-            jogadores[quantidadeJogadores] = jogador;
-            quantidadeJogadores++;
+        if (jogadores.size() < MAX_JOGADORES) {
+            jogadores.add(jogador);
             System.out.println("Jogador " + jogador.getId() + " foi incluído.");
         } else {
-            System.out.println("Não há mais espaço para novos jogadores.");
+            System.out.println("Capacidade máxima de jogadores atingida.");
         }
     }
 
     public void removerJogador(String id) {
-        boolean jogadorRemovido = false;
-        for (int i = 0; i < quantidadeJogadores; i++) {
-            if (jogadores[i].getId().equals(id)) {
-                for (int j = i; j < quantidadeJogadores - 1; j++) {
-                    jogadores[j] = jogadores[j + 1];
-                }
-                jogadores[quantidadeJogadores - 1] = null;
-                quantidadeJogadores--;
-                jogadorRemovido = true;
-                break;
-            }
-        }
-        if (jogadorRemovido) {
-            System.out.println("Jogador " + id + " foi removido.");
-        } else {
-            System.out.println("Jogador " + id + " não encontrado.");
-        }
+        jogadores.removeIf(jogador -> jogador.getId().equals(id));
+        System.out.println("Jogador " + id + " foi removido.");
     }
 
     public void escolherJogo(int jogo) {
         this.jogoEscolhido = jogo;
-        String nomeJogo = (jogo == 0) ? "Jogo de Azar" : "Jogo do Porquinho";
-        System.out.println("Jogo escolhido para o torneio: " + nomeJogo);
+        System.out.println("Jogo escolhido para o torneio: " + (jogo == 0 ? "Jogo de Azar" : "Jogo do Porquinho"));
     }
 
     public void iniciarTorneio(Scanner scanner) {
-        if (quantidadeJogadores < 2) {
+        if (jogadores.size() < 2) {
             System.out.println("É necessário pelo menos 2 jogadores para iniciar o torneio.");
             return;
         }
 
         // Restabelece o saldo dos jogadores
-        for (int i = 0; i < quantidadeJogadores; i++) {
-            jogadores[i].setSaldo(100); // Define o saldo inicial de 100 moedas
+        for (Jogador jogador : jogadores) {
+            jogador.setSaldo(100); // Define o saldo inicial de 100 moedas
         }
 
-        while (quantidadeJogadores > 1) {
+        while (jogadores.size() > 1) {
             // Executa as rodadas do torneio
-            while (quantidadeJogadores > 1) {
+            while (jogadores.size() > 1) {
                 executarRodada(scanner);
             }
         }
 
-        if (quantidadeJogadores == 1) {
-            Jogador vencedor = jogadores[0];
+        if (jogadores.size() == 1) {
+            Jogador vencedor = jogadores.get(0);
             System.out.printf("O vencedor do torneio é %s com um saldo de %.2f%n", vencedor.getId(), vencedor.getSaldo());
         } else {
             System.out.println("Não há um vencedor único. O torneio terminou sem um vencedor.");
@@ -80,8 +63,7 @@ public class Torneio {
         double maiorAposta = -1;
         Jogador vencedorAzar = null;
 
-        for (int i = 0; i < quantidadeJogadores; i++) {
-            Jogador jogador = jogadores[i];
+        for (Jogador jogador : jogadores) {
             if (jogador.getSaldo() <= 0) {
                 continue;
             }
@@ -148,22 +130,17 @@ public class Torneio {
 
         // Relatório da rodada
         System.out.println("Relatório da Rodada:");
-        int j = 0;
-        while (j < quantidadeJogadores) {
-            Jogador jogador = jogadores[j];
+        List<Jogador> jogadoresParaRemover = new ArrayList<>();
+        for (Jogador jogador : jogadores) {
             if (jogador.getSaldo() <= 0) {
                 jogador.setSaldo(0);
                 System.out.println("Jogador " + jogador.getId() + " foi eliminado por saldo insuficiente.");
-                // Remove o jogador e ajusta a quantidade
-                quantidadeJogadores--;
-                for (int k = j; k < quantidadeJogadores; k++) {
-                    jogadores[k] = jogadores[k + 1];
-                }
+                jogadoresParaRemover.add(jogador);
             } else {
                 System.out.printf("Jogador %s - Aposta: %.2f - Saldo Atual: %.2f%n", jogador.getId(), jogador.getAposta(), jogador.getSaldo());
-                j++;
             }
         }
+        jogadores.removeAll(jogadoresParaRemover);
 
         // Separador de relatório
         System.out.println("--------------------------------------------------");
@@ -171,8 +148,26 @@ public class Torneio {
 
     public void placarTorneio() {
         System.out.println("Placar do Torneio:");
-        for (int i = 0; i < quantidadeJogadores; i++) {
-            System.out.println(jogadores[i]);
+        for (Jogador jogador : jogadores) {
+            System.out.println(jogador);
+        }
+    }
+
+    public void gravarTorneio(String nomeArquivo) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nomeArquivo))) {
+            oos.writeObject(this);
+            System.out.println("Torneio gravado com sucesso.");
+        } catch (IOException e) {
+            System.err.println("Erro ao gravar o torneio: " + e.getMessage());
+        }
+    }
+
+    public static Torneio lerTorneio(String nomeArquivo) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomeArquivo))) {
+            return (Torneio) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Erro ao ler o torneio: " + e.getMessage());
+            return null;
         }
     }
 }

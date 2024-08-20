@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class simuladorTorneio {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Torneio torneio = new Torneio(10); // Capacidade de 10 jogadores
+        Torneio torneio = new Torneio(Torneio.MAX_JOGADORES); // Capacidade de jogadores é MAX_JOGADORES
 
         while (true) {
             System.out.println("Menu:");
@@ -11,6 +11,8 @@ public class simuladorTorneio {
             System.out.println("(2) Remover jogador");
             System.out.println("(3) Iniciar torneio");
             System.out.println("(4) Placar do torneio");
+            System.out.println("(5) Gravar torneio");
+            System.out.println("(6) Ler torneio");
             System.out.println("(7) Sair");
             System.out.print("Escolha uma opção: ");
 
@@ -60,6 +62,20 @@ public class simuladorTorneio {
                     break;
                 case 4:
                     torneio.placarTorneio();
+                    break;
+                case 5:
+                    System.out.print("Digite o nome do arquivo para gravar o torneio: ");
+                    String arquivoGravar = scanner.nextLine();
+                    torneio.gravarTorneio(arquivoGravar);
+                    break;
+                case 6:
+                    System.out.print("Digite o nome do arquivo para ler o torneio: ");
+                    String arquivoLer = scanner.nextLine();
+                    Torneio torneioLido = Torneio.lerTorneio(arquivoLer);
+                    if (torneioLido != null) {
+                        torneio = torneioLido;
+                        System.out.println("Torneio lido com sucesso.");
+                    }
                     break;
                 case 7:
                     System.out.println("Encerrando o programa.");
