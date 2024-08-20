@@ -1,56 +1,78 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Torneio {
-    private List<Jogador> jogadores;
+    private Jogador[] jogadores;
+    private int quantidadeJogadores;
     private int jogoEscolhido;
 
     public Torneio(int capacidade) {
-        jogadores = new ArrayList<>(capacidade);
+        jogadores = new Jogador[capacidade];
+        quantidadeJogadores = 0;
         jogoEscolhido = -1;
     }
 
     public void incluirJogador(Jogador jogador) {
-        jogadores.add(jogador);
-        System.out.println("Jogador " + jogador.getId() + " foi incluído.");
+        if (quantidadeJogadores < jogadores.length) {
+            jogadores[quantidadeJogadores] = jogador;
+            quantidadeJogadores++;
+            System.out.println("Jogador " + jogador.getId() + " foi incluído.");
+        } else {
+            System.out.println("Não há mais espaço para novos jogadores.");
+        }
     }
 
     public void removerJogador(String id) {
-        jogadores.removeIf(jogador -> jogador.getId().equals(id));
-        System.out.println("Jogador " + id + " foi removido.");
+        boolean jogadorRemovido = false;
+        for (int i = 0; i < quantidadeJogadores; i++) {
+            if (jogadores[i].getId().equals(id)) {
+                for (int j = i; j < quantidadeJogadores - 1; j++) {
+                    jogadores[j] = jogadores[j + 1];
+                }
+                jogadores[quantidadeJogadores - 1] = null;
+                quantidadeJogadores--;
+                jogadorRemovido = true;
+                break;
+            }
+        }
+        if (jogadorRemovido) {
+            System.out.println("Jogador " + id + " foi removido.");
+        } else {
+            System.out.println("Jogador " + id + " não encontrado.");
+        }
     }
 
     public void escolherJogo(int jogo) {
         this.jogoEscolhido = jogo;
-        System.out.println("Jogo escolhido para o torneio: " + jogoEscolhido);
+        String nomeJogo = (jogo == 0) ? "Jogo de Azar" : "Jogo do Porquinho";
+        System.out.println("Jogo escolhido para o torneio: " + nomeJogo);
     }
 
     public void iniciarTorneio(Scanner scanner) {
-        if (jogadores.size() < 2) {
+        if (quantidadeJogadores < 2) {
             System.out.println("É necessário pelo menos 2 jogadores para iniciar o torneio.");
             return;
         }
 
         // Restabelece o saldo dos jogadores
-        for (Jogador jogador : jogadores) {
-            jogador.setSaldo(100); // Define o saldo inicial de 100 moedas
+        for (int i = 0; i < quantidadeJogadores; i++) {
+            jogadores[i].setSaldo(100); // Define o saldo inicial de 100 moedas
         }
 
-        while (jogadores.size() > 1) {
+        while (quantidadeJogadores > 1) {
             // Executa as rodadas do torneio
-            while (jogadores.size() > 1) {
+            while (quantidadeJogadores > 1) {
                 executarRodada(scanner);
             }
         }
 
-        if (jogadores.size() == 1) {
-            Jogador vencedor = jogadores.get(0);
+        if (quantidadeJogadores == 1) {
+            Jogador vencedor = jogadores[0];
             System.out.printf("O vencedor do torneio é %s com um saldo de %.2f%n", vencedor.getId(), vencedor.getSaldo());
         } else {
             System.out.println("Não há um vencedor único. O torneio terminou sem um vencedor.");
         }
     }
+
     private void executarRodada(Scanner scanner) {
         double totalApostas = 0;
         Jogador vencedorPorquinho = null;
@@ -58,7 +80,8 @@ public class Torneio {
         double maiorAposta = -1;
         Jogador vencedorAzar = null;
 
-        for (Jogador jogador : jogadores) {
+        for (int i = 0; i < quantidadeJogadores; i++) {
+            Jogador jogador = jogadores[i];
             if (jogador.getSaldo() <= 0) {
                 continue;
             }
@@ -125,17 +148,22 @@ public class Torneio {
 
         // Relatório da rodada
         System.out.println("Relatório da Rodada:");
-        List<Jogador> jogadoresParaRemover = new ArrayList<>();
-        for (Jogador jogador : jogadores) {
+        int j = 0;
+        while (j < quantidadeJogadores) {
+            Jogador jogador = jogadores[j];
             if (jogador.getSaldo() <= 0) {
                 jogador.setSaldo(0);
                 System.out.println("Jogador " + jogador.getId() + " foi eliminado por saldo insuficiente.");
-                jogadoresParaRemover.add(jogador);
+                // Remove o jogador e ajusta a quantidade
+                quantidadeJogadores--;
+                for (int k = j; k < quantidadeJogadores; k++) {
+                    jogadores[k] = jogadores[k + 1];
+                }
             } else {
                 System.out.printf("Jogador %s - Aposta: %.2f - Saldo Atual: %.2f%n", jogador.getId(), jogador.getAposta(), jogador.getSaldo());
+                j++;
             }
         }
-        jogadores.removeAll(jogadoresParaRemover);
 
         // Separador de relatório
         System.out.println("--------------------------------------------------");
@@ -143,8 +171,8 @@ public class Torneio {
 
     public void placarTorneio() {
         System.out.println("Placar do Torneio:");
-        for (Jogador jogador : jogadores) {
-            System.out.println(jogador);
+        for (int i = 0; i < quantidadeJogadores; i++) {
+            System.out.println(jogadores[i]);
         }
     }
 }

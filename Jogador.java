@@ -51,6 +51,6 @@ public class Jogador {
 
     @Override
     public String toString() {
-        return String.format("Jogador %s - Saldo: %.2f - Número de Jogadas: %d", id, saldo, numeroDeJogadas);
+        return String.format("Jogador %s - Saldo: %.2f", id, saldo);
     }
 }
