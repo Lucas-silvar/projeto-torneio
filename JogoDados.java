@@ -40,7 +40,6 @@ public class JogoDados {
             }
         }
     }
-
     public double jogoPorquinho(Jogador jogador) {
         int pontos = 0;
         int lancamentos = 0;

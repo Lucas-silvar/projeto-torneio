@@ -51,7 +51,6 @@ public class Torneio {
             System.out.println("Não há um vencedor único. O torneio terminou sem um vencedor.");
         }
     }
-
     private void executarRodada(Scanner scanner) {
         double totalApostas = 0;
         Jogador vencedorPorquinho = null;
@@ -66,6 +65,7 @@ public class Torneio {
 
             double aposta;
             if (jogador.isHumano()) {
+                System.out.printf("Saldo atual de %s: %.2f%n", jogador.getId(), jogador.getSaldo());
                 while (true) {
                     System.out.print("Jogador " + jogador.getId() + ", informe o valor que deseja apostar: ");
                     aposta = scanner.nextDouble();
@@ -78,6 +78,7 @@ public class Torneio {
                 }
             } else {
                 aposta = jogador.getSaldo() / 5; // Máquinas apostam 1/5 do saldo
+                System.out.printf("Jogador %s (máquina) - Saldo: %.2f, Aposta: %.2f%n", jogador.getId(), jogador.getSaldo(), aposta);
             }
 
             jogador.setAposta(aposta);
@@ -135,6 +136,9 @@ public class Torneio {
             }
         }
         jogadores.removeAll(jogadoresParaRemover);
+
+        // Separador de relatório
+        System.out.println("--------------------------------------------------");
     }
 
     public void placarTorneio() {
