@@ -61,8 +61,14 @@ public class JogoDados {
 
             pontos += multiplicacao;
             System.out.printf("Lançamento %d: %d * %d = %d (Pontos: %d)%n", lancamentos, dado1, dado2, multiplicacao, pontos);
+
+            if (pontos >= 300) {
+                jogador.incrementarNumeroDeJogadas(); // Incrementa o número de jogadas do jogador
+                break; // Para quando atingir ou ultrapassar 300 pontos
+            }
         }
 
         return pontos;
     }
+
 }

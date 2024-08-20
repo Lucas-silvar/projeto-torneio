@@ -1,11 +1,9 @@
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class simuladorTorneio {
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Torneio torneio = new Torneio(10); // Defina uma capacidade fixa para o torneio
+        Torneio torneio = new Torneio(10); // Capacidade de 10 jogadores
 
         while (true) {
             System.out.println("Menu:");
@@ -16,14 +14,12 @@ public class simuladorTorneio {
             System.out.println("(7) Sair");
             System.out.print("Escolha uma opção: ");
 
-            int opcao = -1;
+            int opcao;
             try {
-                opcao = scanner.nextInt();
-                scanner.nextLine();
-            } catch (InputMismatchException e) {
+                opcao = Integer.parseInt(scanner.nextLine());  // Usa nextLine e parse para evitar problemas de buffer
+            } catch (NumberFormatException e) {
                 System.out.println("Entrada inválida. Por favor, insira um número.");
-                scanner.nextLine();
-                continue;
+                continue;  // Volta para o início do loop
             }
 
             switch (opcao) {
@@ -31,16 +27,15 @@ public class simuladorTorneio {
                     System.out.print("Digite o ID do jogador: ");
                     String id = scanner.nextLine();
                     System.out.print("Jogador é humano? (0 - máquina / 1 - humano): ");
-                    int tipo = -1;
+                    int tipo;
                     try {
-                        tipo = scanner.nextInt();
-                        scanner.nextLine();
-                    } catch (InputMismatchException e) {
+                        tipo = Integer.parseInt(scanner.nextLine());  // Usa nextLine e parse para evitar problemas de buffer
+                    } catch (NumberFormatException e) {
                         System.out.println("Entrada inválida. Por favor, insira 0 ou 1.");
-                        scanner.nextLine();
-                        continue;
+                        continue;  // Volta para o início do loop
                     }
-                    Jogador jogador = new Jogador(id, tipo == 1 ? "humano" : "máquina");
+
+                    Jogador jogador = new Jogador(id, tipo == 1);
                     torneio.incluirJogador(jogador);
                     break;
                 case 2:
@@ -49,45 +44,31 @@ public class simuladorTorneio {
                     torneio.removerJogador(idRemover);
                     break;
                 case 3:
-                    int jogoEscolhido = escolherJogo(scanner);
-                    if (jogoEscolhido != -1) {
-                        torneio.escolherJogo(jogoEscolhido);
-                        torneio.iniciarTorneio(scanner); // Passando o scanner para coletar apostas
+                    System.out.println("Escolha o jogo para o torneio:");
+                    System.out.println("(0) Jogo de Azar");
+                    System.out.println("(1) Jogo do Porquinho");
+                    int jogoEscolhido;
+                    try {
+                        jogoEscolhido = Integer.parseInt(scanner.nextLine());  // Usa nextLine e parse para evitar problemas de buffer
+                    } catch (NumberFormatException e) {
+                        System.out.println("Entrada inválida. Por favor, insira 0 ou 1.");
+                        continue;  // Volta para o início do loop
                     }
+
+                    torneio.escolherJogo(jogoEscolhido);
+                    torneio.iniciarTorneio(scanner);
                     break;
                 case 4:
                     torneio.placarTorneio();
                     break;
                 case 7:
-                    System.out.println("Saindo...");
+                    System.out.println("Encerrando o programa.");
                     scanner.close();
                     return;
                 default:
-                    System.out.println("Opção inválida.");
+                    System.out.println("Opção inválida. Tente novamente.");
+                    break;
             }
         }
-    }
-
-    private static int escolherJogo(Scanner scanner) {
-        System.out.println("Escolha o jogo para o torneio:");
-        System.out.println("(0) Jogo de Azar");
-        System.out.println("(1) Jogo do Porquinho");
-
-        int escolha = -1;
-        try {
-            escolha = scanner.nextInt();
-            scanner.nextLine();
-        } catch (InputMismatchException e) {
-            System.out.println("Entrada inválida. Por favor, insira um número entre 0 e 1.");
-            scanner.nextLine();
-            return -1;
-        }
-
-        if (escolha < 0 || escolha > 1) {
-            System.out.println("Opção inválida.");
-            return -1;
-        }
-
-        return escolha;
     }
 }

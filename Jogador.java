@@ -1,22 +1,24 @@
 public class Jogador {
     private String id;
-    private String tipo; // Tipo de jogador: "humano" ou "máquina"
+    private boolean humano;
     private double saldo;
     private double aposta;
+    private int numeroDeJogadas;
 
-    public Jogador(String id, String tipo) {
+    public Jogador(String id, boolean humano) {
         this.id = id;
-        this.tipo = tipo;
-        this.saldo = 0; // O saldo será definido ao iniciar o torneio
+        this.humano = humano;
+        this.saldo = 0;
+        this.aposta = 0;
+        this.numeroDeJogadas = 0;
     }
 
-    // Getters e Setters
     public String getId() {
         return id;
     }
 
-    public String getTipo() {
-        return tipo;
+    public boolean isHumano() {
+        return humano;
     }
 
     public double getSaldo() {
@@ -35,25 +37,20 @@ public class Jogador {
         this.aposta = aposta;
     }
 
-    public boolean isMaquina() {
-        return "máquina".equalsIgnoreCase(tipo);
-    }
-
     public void ajustarSaldo(double valor) {
         this.saldo += valor;
     }
 
-    public boolean podeApostar() {
-        return saldo > 0;
+    public void incrementarNumeroDeJogadas() {
+        this.numeroDeJogadas++;
     }
 
-    public void apostar(double aposta) {
-        setAposta(aposta);
-        ajustarSaldo(-aposta);
+    public int getNumeroDeJogadas() {
+        return numeroDeJogadas;
     }
 
     @Override
     public String toString() {
-        return "Jogador: " + id + " | Tipo: " + tipo + " | Saldo: " + saldo + " | Aposta: " + aposta;
+        return String.format("Jogador %s - Saldo: %.2f - Número de Jogadas: %d", id, saldo, numeroDeJogadas);
     }
 }
