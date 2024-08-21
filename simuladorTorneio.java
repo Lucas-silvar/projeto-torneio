@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class simuladorTorneio {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Torneio torneio = new Torneio(Torneio.MAX_JOGADORES); // Capacidade de jogadores é MAX_JOGADORES
+        Torneio torneio = new Torneio();
 
         while (true) {
             System.out.println("Menu:");
@@ -11,17 +11,17 @@ public class simuladorTorneio {
             System.out.println("(2) Remover jogador");
             System.out.println("(3) Iniciar torneio");
             System.out.println("(4) Placar do torneio");
-            System.out.println("(5) Gravar torneio");
-            System.out.println("(6) Ler torneio");
+            System.out.println("(5) Gravar torneio em arquivo");
+            System.out.println("(6) Ler torneio de arquivo");
             System.out.println("(7) Sair");
             System.out.print("Escolha uma opção: ");
 
             int opcao;
             try {
-                opcao = Integer.parseInt(scanner.nextLine());  // Usa nextLine e parse para evitar problemas de buffer
+                opcao = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Entrada inválida. Por favor, insira um número.");
-                continue;  // Volta para o início do loop
+                continue;
             }
 
             switch (opcao) {
@@ -31,10 +31,10 @@ public class simuladorTorneio {
                     System.out.print("Jogador é humano? (0 - máquina / 1 - humano): ");
                     int tipo;
                     try {
-                        tipo = Integer.parseInt(scanner.nextLine());  // Usa nextLine e parse para evitar problemas de buffer
+                        tipo = Integer.parseInt(scanner.nextLine());
                     } catch (NumberFormatException e) {
                         System.out.println("Entrada inválida. Por favor, insira 0 ou 1.");
-                        continue;  // Volta para o início do loop
+                        continue;
                     }
 
                     Jogador jogador = new Jogador(id, tipo == 1);
@@ -51,10 +51,10 @@ public class simuladorTorneio {
                     System.out.println("(1) Jogo do Porquinho");
                     int jogoEscolhido;
                     try {
-                        jogoEscolhido = Integer.parseInt(scanner.nextLine());  // Usa nextLine e parse para evitar problemas de buffer
+                        jogoEscolhido = Integer.parseInt(scanner.nextLine());
                     } catch (NumberFormatException e) {
                         System.out.println("Entrada inválida. Por favor, insira 0 ou 1.");
-                        continue;  // Volta para o início do loop
+                        continue;
                     }
 
                     torneio.escolherJogo(jogoEscolhido);
@@ -64,18 +64,10 @@ public class simuladorTorneio {
                     torneio.placarTorneio();
                     break;
                 case 5:
-                    System.out.print("Digite o nome do arquivo para gravar o torneio: ");
-                    String arquivoGravar = scanner.nextLine();
-                    torneio.gravarTorneio(arquivoGravar);
+                    torneio.gravarEmArquivo();
                     break;
                 case 6:
-                    System.out.print("Digite o nome do arquivo para ler o torneio: ");
-                    String arquivoLer = scanner.nextLine();
-                    Torneio torneioLido = Torneio.lerTorneio(arquivoLer);
-                    if (torneioLido != null) {
-                        torneio = torneioLido;
-                        System.out.println("Torneio lido com sucesso.");
-                    }
+                    torneio.lerDoArquivo();
                     break;
                 case 7:
                     System.out.println("Encerrando o programa.");

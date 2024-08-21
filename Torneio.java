@@ -1,28 +1,39 @@
 import java.io.*;
-import java.util.*;
+import java.util.Scanner;
 
-public class Torneio {
-    private List<Jogador> jogadores;
+public class Torneio implements Serializable {
+    private static final int MAX_JOGADORES = 10; // Número máximo de jogadores
+    private Jogador[] jogadores;
+    private int numeroJogadores;
     private int jogoEscolhido;
-   public static final int MAX_JOGADORES = 10; // Atributo final como número máximo de jogadores
 
-    public Torneio(int capacidade) {
-        jogadores = new ArrayList<>(capacidade);
-        jogoEscolhido = -1;
+    public Torneio() {
+        this.jogadores = new Jogador[MAX_JOGADORES];
+        this.numeroJogadores = 0;
+        this.jogoEscolhido = -1;
     }
 
     public void incluirJogador(Jogador jogador) {
-        if (jogadores.size() < MAX_JOGADORES) {
-            jogadores.add(jogador);
+        if (numeroJogadores < MAX_JOGADORES) {
+            jogadores[numeroJogadores++] = jogador;
             System.out.println("Jogador " + jogador.getId() + " foi incluído.");
         } else {
-            System.out.println("Capacidade máxima de jogadores atingida.");
+            System.out.println("Número máximo de jogadores atingido.");
         }
     }
 
     public void removerJogador(String id) {
-        jogadores.removeIf(jogador -> jogador.getId().equals(id));
-        System.out.println("Jogador " + id + " foi removido.");
+        for (int i = 0; i < numeroJogadores; i++) {
+            if (jogadores[i].getId().equals(id)) {
+                for (int j = i; j < numeroJogadores - 1; j++) {
+                    jogadores[j] = jogadores[j + 1];
+                }
+                jogadores[--numeroJogadores] = null;
+                System.out.println("Jogador " + id + " foi removido.");
+                return;
+            }
+        }
+        System.out.println("Jogador " + id + " não encontrado.");
     }
 
     public void escolherJogo(int jogo) {
@@ -31,25 +42,25 @@ public class Torneio {
     }
 
     public void iniciarTorneio(Scanner scanner) {
-        if (jogadores.size() < 2) {
+        if (numeroJogadores < 2) {
             System.out.println("É necessário pelo menos 2 jogadores para iniciar o torneio.");
             return;
         }
 
         // Restabelece o saldo dos jogadores
-        for (Jogador jogador : jogadores) {
-            jogador.setSaldo(100); // Define o saldo inicial de 100 moedas
+        for (int i = 0; i < numeroJogadores; i++) {
+            jogadores[i].setSaldo(100); // Define o saldo inicial de 100 moedas
         }
 
-        while (jogadores.size() > 1) {
+        while (numeroJogadores > 1) {
             // Executa as rodadas do torneio
-            while (jogadores.size() > 1) {
+            while (numeroJogadores > 1) {
                 executarRodada(scanner);
             }
         }
 
-        if (jogadores.size() == 1) {
-            Jogador vencedor = jogadores.get(0);
+        if (numeroJogadores == 1) {
+            Jogador vencedor = jogadores[0];
             System.out.printf("O vencedor do torneio é %s com um saldo de %.2f%n", vencedor.getId(), vencedor.getSaldo());
         } else {
             System.out.println("Não há um vencedor único. O torneio terminou sem um vencedor.");
@@ -63,7 +74,8 @@ public class Torneio {
         double maiorAposta = -1;
         Jogador vencedorAzar = null;
 
-        for (Jogador jogador : jogadores) {
+        for (int i = 0; i < numeroJogadores; i++) {
+            Jogador jogador = jogadores[i];
             if (jogador.getSaldo() <= 0) {
                 continue;
             }
@@ -130,17 +142,25 @@ public class Torneio {
 
         // Relatório da rodada
         System.out.println("Relatório da Rodada:");
-        List<Jogador> jogadoresParaRemover = new ArrayList<>();
-        for (Jogador jogador : jogadores) {
+        int i = 1;
+        Jogador[] jogadoresParaRemover = new Jogador[numeroJogadores];
+        int count = 0;
+        for (int j = 0; j < numeroJogadores; j++) {
+            Jogador jogador = jogadores[j];
             if (jogador.getSaldo() <= 0) {
                 jogador.setSaldo(0);
                 System.out.println("Jogador " + jogador.getId() + " foi eliminado por saldo insuficiente.");
-                jogadoresParaRemover.add(jogador);
+                jogadoresParaRemover[count++] = jogador;
             } else {
                 System.out.printf("Jogador %s - Aposta: %.2f - Saldo Atual: %.2f%n", jogador.getId(), jogador.getAposta(), jogador.getSaldo());
             }
         }
-        jogadores.removeAll(jogadoresParaRemover);
+        // Remove jogadores eliminados
+        for (Jogador jogador : jogadoresParaRemover) {
+            if (jogador != null) {
+                removerJogador(jogador.getId());
+            }
+        }
 
         // Separador de relatório
         System.out.println("--------------------------------------------------");
@@ -148,26 +168,42 @@ public class Torneio {
 
     public void placarTorneio() {
         System.out.println("Placar do Torneio:");
-        for (Jogador jogador : jogadores) {
-            System.out.println(jogador);
+        for (int i = 0; i < numeroJogadores; i++) {
+            System.out.println(jogadores[i]);
         }
     }
 
-    public void gravarTorneio(String nomeArquivo) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nomeArquivo))) {
-            oos.writeObject(this);
-            System.out.println("Torneio gravado com sucesso.");
+    public void gravarEmArquivo() {
+        try {
+            FileOutputStream fout = new FileOutputStream("Campeonato.dat");
+            ObjectOutputStream oos = new ObjectOutputStream(fout);
+            oos.writeInt(numeroJogadores);
+            for (int i = 0; i < numeroJogadores; i++) {
+                oos.writeObject(jogadores[i]);
+            }
+            oos.flush();
+            oos.close();
+            fout.close();
+            System.out.println("Gravado com sucesso!");
         } catch (IOException e) {
-            System.err.println("Erro ao gravar o torneio: " + e.getMessage());
+            System.err.println("Erro ao gravar: " + e.getMessage());
         }
     }
 
-    public static Torneio lerTorneio(String nomeArquivo) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomeArquivo))) {
-            return (Torneio) ois.readObject();
+    public void lerDoArquivo() {
+        try {
+            FileInputStream fin = new FileInputStream("Campeonato.dat");
+            ObjectInputStream oin = new ObjectInputStream(fin);
+            numeroJogadores = oin.readInt();
+            jogadores = new Jogador[MAX_JOGADORES];
+            for (int i = 0; i < numeroJogadores; i++) {
+                jogadores[i] = (Jogador) oin.readObject();
+            }
+            oin.close();
+            fin.close();
+            System.out.println("Leitura concluída com sucesso!");
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Erro ao ler o torneio: " + e.getMessage());
-            return null;
+            System.err.println("Erro ao ler: " + e.getMessage());
         }
     }
 }
