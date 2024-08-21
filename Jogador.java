@@ -1,68 +1,59 @@
-public class Jogador {
-    private String id;
-    private String tipo;
-    private int saldo;
-    private int aposta;
-    private int resultado;
-    private JogoDados.JogoAzar jogoAzar;
-    private JogoDados.Bozo jogoBozo;
-    private JogoDados.JogoPorquinho jogoPorquinho;
+import java.io.Serializable;
 
-    public Jogador(String id, String tipo) {
+public class Jogador implements Serializable {
+    private static final long serialVersionUID = 1L; // Para garantir a compatibilidade na serialização
+    private String id;
+    private boolean humano;
+    private double saldo;
+    private double aposta;
+    private int numeroDeJogadas;
+
+    public Jogador(String id, boolean humano) {
         this.id = id;
-        this.tipo = tipo;
-        this.saldo = 100; // Saldo inicial
+        this.humano = humano;
+        this.saldo = 0;
+        this.aposta = 0;
+        this.numeroDeJogadas = 0;
     }
 
     public String getId() {
         return id;
     }
 
-    public String getTipo() {
-        return tipo;
+    public boolean isHumano() {
+        return humano;
     }
 
-    public int getSaldo() {
+    public double getSaldo() {
         return saldo;
     }
 
-    public void setAposta(int aposta) {
-        this.aposta = aposta;
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
     }
 
-    public int getAposta() {
+    public double getAposta() {
         return aposta;
     }
 
-    public void atualizarSaldo(int valor) {
+    public void setAposta(double aposta) {
+        this.aposta = aposta;
+    }
+
+    public void ajustarSaldo(double valor) {
         this.saldo += valor;
     }
 
-    public void setJogo(String tipoJogo) {
-        switch (tipoJogo) {
-            case "Azar":
-                this.jogoAzar = new JogoDados.JogoAzar();
-                break;
-            case "Bozo":
-                this.jogoBozo = new JogoDados.Bozo();
-                break;
-            case "Porquinho":
-                this.jogoPorquinho = new JogoDados.JogoPorquinho();
-                break;
-            default:
-                throw new IllegalArgumentException("Tipo de jogo desconhecido");
-        }
+    public void incrementarNumeroDeJogadas() {
+        this.numeroDeJogadas++;
     }
 
-    public int jogar(Dado[] dados) {
-        if (jogoAzar != null) {
-            return jogoAzar.jogar(dados);
-        } else if (jogoBozo != null) {
-            return jogoBozo.jogar(dados);
-        } else if (jogoPorquinho != null) {
-            return jogoPorquinho.jogar(dados);
-        } else {
-            throw new IllegalStateException("Jogo não definido");
-        }
+    public int getNumeroDeJogadas() {
+        return numeroDeJogadas;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Jogador %s - Saldo: %.2f - Número de Jogadas: %d", id, saldo, numeroDeJogadas);
     }
 }

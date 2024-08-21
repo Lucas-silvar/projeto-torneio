@@ -1,68 +1,76 @@
+import java.util.Random;
+
 public class JogoDados {
+    private Random random;
 
-    public static class JogoAzar {
-        public static int jogar(Dado[] dados) {
-            int soma = dados[0].getValor() + dados[1].getValor();
-            if (soma == 7 || soma == 11) {
-                return 1; // Vitória
-            } else if (soma == 2 || soma == 3 || soma == 12) {
-                return -1; // Derrota
-            } else {
-                // Continuar jogando até encontrar a soma do primeiro lançamento
-                int numeroBuscado = soma;
-                while (true) {
-                    dados[0].lançar();
-                    dados[1].lançar();
-                    soma = dados[0].getValor() + dados[1].getValor();
-                    if (soma == numeroBuscado) {
-                        return 1; // Vitória
-                    } else if (soma == 7) {
-                        return -1; // Derrota
-                    }
+    public JogoDados() {
+        random = new Random();
+    }
+
+    public boolean jogoAzar(Jogador jogador) {
+        int dado1 = random.nextInt(6) + 1;
+        int dado2 = random.nextInt(6) + 1;
+        int soma = dado1 + dado2;
+        jogador.incrementarNumeroDeJogadas(); // Incrementa o número de jogadas apenas uma vez por rodada
+
+        System.out.printf("Lançamento: %d e %d (Soma: %d)%n", dado1, dado2, soma);
+
+        if (soma == 7 || soma == 11) {
+            System.out.println("Jogador ganhou!");
+            return true;
+        } else if (soma == 2 || soma == 3 || soma == 12) {
+            System.out.println("Jogador perdeu!");
+            return false;
+        } else {
+            int numeroBuscado = soma;
+            System.out.println("Número a ser buscado: " + numeroBuscado);
+
+            while (true) {
+                dado1 = random.nextInt(6) + 1;
+                dado2 = random.nextInt(6) + 1;
+                soma = dado1 + dado2;
+                jogador.incrementarNumeroDeJogadas(); // Incrementa o número de jogadas em cada nova tentativa
+
+                System.out.printf("Nova jogada: %d e %d (Soma: %d)%n", dado1, dado2, soma);
+
+                if (soma == numeroBuscado) {
+                    System.out.println("Jogador ganhou!");
+                    return true;
+                } else if (soma == 2 || soma == 3 || soma == 12) {
+                    System.out.println("Jogador perdeu!");
+                    return false;
                 }
             }
         }
     }
 
-    public static class Bozo {
-        public static int jogar(Dado[] dados) {
-            int maxPontuacao = 0;
-            for (int i = 0; i < 3; i++) {
-                for (Dado dado : dados) {
-                    dado.lançar();
-                }
-                int pontuacao = calcularPontuacao(dados);
-                if (pontuacao > maxPontuacao) {
-                    maxPontuacao = pontuacao;
-                }
-            }
-            return maxPontuacao;
-        }
+    public double jogoPorquinho(Jogador jogador) {
+        int pontos = 0;
+        int lancamentos = 0;
 
-        private static int calcularPontuacao(Dado[] dados) {
-            // Implementar a lógica de cálculo de pontuação de acordo com as regras do Bozo
-            // Aqui, deve-se implementar as regras para calcular a pontuação
-            return 0; // Placeholder
-        }
-    }
+        while (pontos < 300) {
+            lancamentos++;
+            int dado1 = random.nextInt(6) + 1;
+            int dado2 = random.nextInt(6) + 1;
+            int multiplicacao = dado1 * dado2;
 
-    public static class JogoPorquinho {
-        public static int jogar(Dado[] dados) {
-            int pontos = 0;
-            while (pontos < 300) {
-                dados[0].lançar();
-                dados[1].lançar();
-                int multiplicacao = dados[0].getValor() * dados[1].getValor();
-                if (dados[0].getValor() == dados[1].getValor() && dados[0].getValor() == 1) {
-                    pontos += 30;
+            if (dado1 == dado2) {
+                if (dado1 == 1) {
+                    multiplicacao = 30; // Double de 1 é 30 pontos
                 } else {
-                    pontos += multiplicacao * (dados[0].getValor() == dados[1].getValor() ? 2 : 1);
-                }
-                if (pontos >= 300) {
-                    break;
+                    multiplicacao *= 2; // Dobro dos valores em outros casos
                 }
             }
-            return pontos;
+
+            pontos += multiplicacao;
+            System.out.printf("Lançamento %d: %d * %d = %d (Pontos: %d)%n", lancamentos, dado1, dado2, multiplicacao, pontos);
+
+            if (pontos >= 300) {
+                jogador.incrementarNumeroDeJogadas(); // Incrementa o número de jogadas do jogador
+                break; // Para quando atingir ou ultrapassar 300 pontos
+            }
         }
+
+        return pontos;
     }
 }
