@@ -11,6 +11,7 @@ public class JogoDados {
         int dado1 = random.nextInt(6) + 1;
         int dado2 = random.nextInt(6) + 1;
         int soma = dado1 + dado2;
+        jogador.incrementarNumeroDeJogadas(); // Incrementa o número de jogadas apenas uma vez por rodada
 
         System.out.printf("Lançamento: %d e %d (Soma: %d)%n", dado1, dado2, soma);
 
@@ -28,6 +29,8 @@ public class JogoDados {
                 dado1 = random.nextInt(6) + 1;
                 dado2 = random.nextInt(6) + 1;
                 soma = dado1 + dado2;
+                jogador.incrementarNumeroDeJogadas(); // Incrementa o número de jogadas em cada nova tentativa
+
                 System.out.printf("Nova jogada: %d e %d (Soma: %d)%n", dado1, dado2, soma);
 
                 if (soma == numeroBuscado) {

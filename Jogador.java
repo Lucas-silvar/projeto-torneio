@@ -44,6 +44,11 @@ public class Jogador implements Serializable {
         this.saldo += valor;
     }
 
+    // Sobrecarga do método ajustarSaldo
+    public void ajustarSaldo(int valor) {
+        this.saldo += valor;
+    }
+
     public void incrementarNumeroDeJogadas() {
         this.numeroDeJogadas++;
     }
