@@ -3,14 +3,14 @@ import java.util.Scanner;
 public class simuladorTorneio {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Torneio torneio = new Torneio(Torneio.MAX_JOGADORES); // Capacidade de jogadores é MAX_JOGADORES
+        Torneio torneio = new Torneio(Torneio.MAX_JOGADORES); // Inicializa o torneio com capacidade máxima
 
         // Testando a sobrecarga do método ajustarSaldo
         Jogador jogador = new Jogador("Jogador1", true);
-        jogador.ajustarSaldo(50.0); // Usando o método com double
+        jogador.ajustarSaldo(50.0); // Ajusta o saldo usando double
         System.out.println("Após ajustar com double: " + jogador);
 
-        jogador.ajustarSaldo(30);   // Usando o método com int
+        jogador.ajustarSaldo(30);   // Ajusta o saldo usando int (auto-conversão para double)
         System.out.println("Após ajustar com int: " + jogador);
 
         while (true) {

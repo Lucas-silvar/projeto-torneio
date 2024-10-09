@@ -2,12 +2,13 @@ import java.io.Serializable;
 
 public class Jogador implements Serializable {
     private static final long serialVersionUID = 1L; // Para garantir a compatibilidade na serialização
-    private String id;
-    private boolean humano;
-    private double saldo;
-    private double aposta;
-    private int numeroDeJogadas;
+    private String id; // ID do jogador
+    private boolean humano; // Indica se o jogador é humano
+    private double saldo; // Saldo atual do jogador
+    private double aposta; // Valor da aposta do jogador
+    private int numeroDeJogadas; // Número de jogadas do jogador
 
+    // Construtor inicializa o jogador com ID e tipo (humano ou máquina)
     public Jogador(String id, boolean humano) {
         this.id = id;
         this.humano = humano;
@@ -16,6 +17,7 @@ public class Jogador implements Serializable {
         this.numeroDeJogadas = 0;
     }
 
+    // Métodos getters e setters
     public String getId() {
         return id;
     }
@@ -40,15 +42,12 @@ public class Jogador implements Serializable {
         this.aposta = aposta;
     }
 
+    // Ajusta o saldo do jogador (adiciona ou subtrai o valor)
     public void ajustarSaldo(double valor) {
         this.saldo += valor;
     }
 
-    // Sobrecarga do método ajustarSaldo
-    public void ajustarSaldo(int valor) {
-        this.saldo += valor;
-    }
-
+    // Incrementa o número de jogadas do jogador
     public void incrementarNumeroDeJogadas() {
         this.numeroDeJogadas++;
     }

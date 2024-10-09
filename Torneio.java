@@ -2,10 +2,10 @@ import java.io.*;
 import java.util.*;
 
 public class Torneio implements Serializable {
-    private Jogador[] jogadores;
-    private int numJogadores;
-    private int jogoEscolhido;
-    public static final int MAX_JOGADORES = 10; // Atributo final como número máximo de jogadores
+    private Jogador[] jogadores; // Array de jogadores no torneio
+    private int numJogadores; // Número atual de jogadores
+    private int jogoEscolhido; // Tipo de jogo escolhido para o torneio
+    public static final int MAX_JOGADORES = 10; // Número máximo de jogadores
 
     private static final long serialVersionUID = 1L;
 
@@ -49,118 +49,18 @@ public class Torneio implements Serializable {
             return;
         }
 
-        // Restabelece o saldo dos jogadores
-        for (int i = 0; i < numJogadores; i++) {
-            jogadores[i].setSaldo(100); // Define o saldo inicial de 100 moedas
-        }
-
-        while (numJogadores > 1) {
-            // Executa as rodadas do torneio
-            while (numJogadores > 1) {
-                executarRodada(scanner);
-            }
-        }
-
-        if (numJogadores == 1) {
-            Jogador vencedor = jogadores[0];
-            System.out.printf("O vencedor do torneio é %s com um saldo de %.2f%n", vencedor.getId(), vencedor.getSaldo());
-        } else {
-            System.out.println("Não há um vencedor único. O torneio terminou sem um vencedor.");
-        }
-    }
-
-    private void executarRodada(Scanner scanner) {
-        double totalApostas = 0;
-        Jogador vencedorPorquinho = null;
-        int menorNumeroDeLancamentos = Integer.MAX_VALUE;
-        double maiorAposta = -1;
-        Jogador vencedorAzar = null;
-
-        for (int i = 0; i < numJogadores; i++) {
-            Jogador jogador = jogadores[i];
-            if (jogador.getSaldo() <= 0) {
-                continue;
-            }
-
-            double aposta;
-            if (jogador.isHumano()) {
-                System.out.printf("Saldo atual de %s: %.2f%n", jogador.getId(), jogador.getSaldo());
-                while (true) {
-                    System.out.print("Jogador " + jogador.getId() + ", informe o valor que deseja apostar: ");
-                    aposta = scanner.nextDouble();
-                    scanner.nextLine(); // Limpa o buffer
-                    if (aposta > 0 && aposta <= jogador.getSaldo()) {
-                        break;
-                    } else {
-                        System.out.println("Valor de aposta inválido. Deve ser positivo e não maior que o saldo.");
-                    }
-                }
-            } else {
-                aposta = jogador.getSaldo() / 5; // Máquinas apostam 1/5 do saldo
-                System.out.printf("Jogador %s (máquina) - Saldo: %.2f, Aposta: %.2f%n", jogador.getId(), jogador.getSaldo(), aposta);
-            }
-
-            jogador.setAposta(aposta);
-            jogador.ajustarSaldo(-aposta);
-            totalApostas += aposta;
-
-            switch (jogoEscolhido) {
-                case 0: // Jogo de Azar
-                    boolean ganhou = new JogoDados().jogoAzar(jogador);
-                    if (ganhou) {
-                        vencedorAzar = jogador;
-                    }
-                    break;
-
-                case 1: // Jogo do Porquinho
-                    double pontos = new JogoDados().jogoPorquinho(jogador);
-                    int lancamentos = jogador.getNumeroDeJogadas();
-
-                    if (pontos >= 300) {
-                        if (lancamentos < menorNumeroDeLancamentos ||
-                                (lancamentos == menorNumeroDeLancamentos && aposta > maiorAposta)) {
-                            vencedorPorquinho = jogador;
-                            menorNumeroDeLancamentos = lancamentos;
-                            maiorAposta = aposta;
-                        }
-                    }
-                    break;
-            }
-        }
-
-        // Verificação do vencedor para o jogo do Porquinho
-        if (jogoEscolhido == 1 && vencedorPorquinho != null) {
-            vencedorPorquinho.ajustarSaldo(totalApostas);
-            System.out.println("Vencedor da rodada: " + vencedorPorquinho.getId() + " com saldo de " + vencedorPorquinho.getSaldo());
+        // Implementar lógica de torneio de acordo com o jogo escolhido
+        if (jogoEscolhido == 0) {
+            // Implementar lógica do Jogo de Azar
+            System.out.println("Iniciando o Jogo de Azar...");
+            // Aqui você pode implementar a lógica do jogo
         } else if (jogoEscolhido == 1) {
-            System.out.println("Nenhum jogador atingiu 300 pontos ou houve empate sem vencedor.");
+            // Implementar lógica do Jogo do Porquinho
+            System.out.println("Iniciando o Jogo do Porquinho...");
+            // Aqui você pode implementar a lógica do jogo
+        } else {
+            System.out.println("Jogo escolhido inválido.");
         }
-
-        // Verificação do vencedor para o jogo de azar
-        if (jogoEscolhido == 0 && vencedorAzar != null) {
-            vencedorAzar.ajustarSaldo(totalApostas);
-            System.out.println("Vencedor da rodada: " + vencedorAzar.getId() + " com saldo de " + vencedorAzar.getSaldo());
-        }
-
-        // Relatório da rodada
-        System.out.println("Relatório da Rodada:");
-        List<Jogador> jogadoresParaRemover = new ArrayList<>();
-        for (int i = 0; i < numJogadores; i++) {
-            Jogador jogador = jogadores[i];
-            if (jogador.getSaldo() <= 0) {
-                jogador.setSaldo(0);
-                System.out.println("Jogador " + jogador.getId() + " foi eliminado por saldo insuficiente.");
-                jogadoresParaRemover.add(jogador);
-            } else {
-                System.out.printf("Jogador %s - Aposta: %.2f - Saldo Atual: %.2f%n", jogador.getId(), jogador.getAposta(), jogador.getSaldo());
-            }
-        }
-        for (Jogador jogador : jogadoresParaRemover) {
-            removerJogador(jogador.getId());
-        }
-
-        // Separador de relatório
-        System.out.println("--------------------------------------------------");
     }
 
     public void placarTorneio() {
@@ -171,20 +71,19 @@ public class Torneio implements Serializable {
     }
 
     public void gravarTorneio(String nomeArquivo) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nomeArquivo))) {
-            oos.writeObject(this);
-            System.out.println("Torneio gravado com sucesso.");
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(nomeArquivo))) {
+            out.writeObject(this);
+            System.out.println("Torneio gravado com sucesso no arquivo " + nomeArquivo);
         } catch (IOException e) {
-            System.err.println("Erro ao gravar o torneio: " + e.getMessage());
+            System.out.println("Erro ao gravar o torneio: " + e.getMessage());
         }
     }
 
-
     public static Torneio lerTorneio(String nomeArquivo) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomeArquivo))) {
-            return (Torneio) ois.readObject();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(nomeArquivo))) {
+            return (Torneio) in.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Erro ao ler o torneio: " + e.getMessage());
+            System.out.println("Erro ao ler o torneio: " + e.getMessage());
             return null;
         }
     }
